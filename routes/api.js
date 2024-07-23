@@ -7,12 +7,10 @@ module.exports = function (app) {
 
   app.route('/api/check').post((req, res) => {
     const { puzzle, coordinate, value } = req.body;
-    const row = coordinate[1]
-    const column = coordinate[0]
+    const row = coordinate[0]
+    const column = coordinate[1]
     try {
       // solver.validate(puzzle)
-      console.log(req.body)
-
       solver.checkRowPlacement(puzzle, row, column, value)
       solver.checkColPlacement(puzzle, row, column, value)
       solver.checkRegionPlacement(puzzle, row, column, value)
