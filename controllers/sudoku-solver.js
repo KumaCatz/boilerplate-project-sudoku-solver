@@ -11,13 +11,26 @@ class SudokuSolver {
     }
   }
 
-  updateWithCheckNumber(string, placement, value) {
+  constructSudokuObj(string) {
+    let splitString = string.split('');
+    let result = {};
+    for (let i = 0; i < 9; i++) {
+      result[i] = [];
+      for (let n = 0; n < 9; n++) {
+        result[i].push(splitString[i * 9 + n]);
+      }
+    }
+    return result;
+  }
+
+  updateWithCheckNumber(array, placement, value) {
+    const string = array.join('');
     return (
       string.substring(0, Number(placement) - 1) +
       value +
       string.substring(Number(placement))
     );
-  };
+  }
 
   letterToIndex(letter) {
     const mapping = {
@@ -33,9 +46,10 @@ class SudokuSolver {
       j: 9,
     };
     return mapping[letter];
-  };
-  
+  }
+
   onlyUniqueNumbers(string) {
+    // console.log(string)
     let uniqueNumbers = new Set();
     for (let i = 0; i < string.length; i++) {
       if (string[i] !== '.') {
@@ -48,20 +62,12 @@ class SudokuSolver {
     return true;
   }
 
-  stringToRowArray(string, size) {
-    const result = [];
-    for (let i = 0; i < string.length; i += size) {
-      result.push(string.slice(i, i + size));
-    }
-    return result;
-  };
-
   checkRowPlacement(puzzleString, row, column, value) {
     const normalizedRow = row.toLowerCase();
-    const chunkedArray = this.stringToRowArray(puzzleString, 9);
-    const relevantPuzzleString = chunkedArray[this.letterToIndex(normalizedRow)];
+    const relevantPuzzleArray =
+      this.constructSudokuObj(puzzleString)[this.letterToIndex(normalizedRow)];
     const puzzleStringUpdated = this.updateWithCheckNumber(
-      relevantPuzzleString,
+      relevantPuzzleArray,
       column,
       value
     );
@@ -74,32 +80,14 @@ class SudokuSolver {
     }
   }
 
-  stringToColArray(string, positions) {
-    const result = [];
-    for (let i = 0; i < positions.length; i++) {
-      result.push([]);
-    }
-    for (let i = 0; i < string.length; i++) {
-      const subArrayIndex = positions.findIndex(
-        (index) => i % 9 === index % 9
-      );
-      if (subArrayIndex !== -1) {
-        result[subArrayIndex].push(string[i]);
-      }
-    }
-    for (let i = 0; i < positions.length; i++) {
-      result[i] = result[i].join('')
-    }
-    return result;
-  };
-
   checkColPlacement(puzzleString, row, column, value) {
-    const positions = [0, 1, 2, 3, 4, 5, 6, 7, 8];
     const normalizedRow = row.toLowerCase();
-    const chunkedArray = this.stringToColArray(puzzleString, positions);
-    const relevantPuzzleString = chunkedArray[column - 1];
+    const columnArray = [];
+    for (let i = 0; i < 9; i++) {
+      columnArray[i] = this.constructSudokuObj(puzzleString)[i][column - 1];
+    }
     const puzzleStringUpdated = this.updateWithCheckNumber(
-      relevantPuzzleString,
+      columnArray,
       this.letterToIndex(normalizedRow) + 1,
       value
     );
@@ -112,10 +100,52 @@ class SudokuSolver {
     }
   }
 
+  stringToRegArray(string) {
+    const coordinates = {
+      0: [0, 1, 2, 9, 10, 11, 18, 19, 20],
+      1: [3, 4, 5, 12, 13, 14, 21, 22, 23],
+      2: [6, 7, 8, 15, 16, 17, 24, 25, 26],
+      3: [27, 28, 29, 36, 37, 38, 45, 46, 47],
+      4: [30, 31, 32, 39, 40, 41, 48, 49, 50],
+      5: [33, 34, 35, 42, 43, 44, 51, 52, 53],
+      6: [54, 55, 56, 63, 64, 65, 72, 73, 74],
+      7: [57, 58, 59, 66, 67, 68, 75, 76, 77],
+      8: [60, 61, 62, 69, 70, 71, 78, 79, 80],
+    };
+    let result = [];
+    for (let i = 0; i < 9; i++) {
+      result.push([]);
+    }
+
+    for (let i = 0; i < Object.keys(coordinates).length; i++) {
+      for (let j = 0; j < coordinates[i].length; j++) {
+        result[i].push(string[coordinates[i][j]]);
+      }
+    }
+    for (let i = 0; i < Object.keys(coordinates).length; i++) {
+      result[i] = result[i].join('');
+    }
+    return result;
+  }
+
   checkRegionPlacement(puzzleString, row, column, value) {
-    // if (!isValid) {
-    //   throw {valid: false, conflict: 'region'}
-    // }
+    const rowIndex = this.letterToIndex(row.toLowerCase());
+    let sudokuObjUpdated = { ...this.constructSudokuObj(puzzleString) };
+    sudokuObjUpdated[rowIndex][column - 1] = value;
+    let puzzleStringUpdated = '';
+    for (let prop in sudokuObjUpdated) {
+      puzzleStringUpdated += sudokuObjUpdated[prop].join('');
+    }
+    const chunkedArray = this.stringToRegArray(puzzleStringUpdated);
+    const normalizedRow = row.toLowerCase();
+    const indexNumber = Number(column) * (this.letterToIndex(normalizedRow) + 1);
+    const arrayIndex = Math.floor(indexNumber / 9);
+    if (!this.onlyUniqueNumbers(chunkedArray[arrayIndex])) {
+      console.log('false region');
+      return false;
+    } else {
+      return true;
+    }
   }
 
   solve(puzzleString) {
