@@ -49,7 +49,6 @@ class SudokuSolver {
   }
 
   onlyUniqueNumbers(string) {
-    // console.log(string)
     let uniqueNumbers = new Set();
     for (let i = 0; i < string.length; i++) {
       if (string[i] !== '.') {
@@ -63,7 +62,9 @@ class SudokuSolver {
   }
 
   checkRowPlacement(puzzleString, row, column, value) {
-    const normalizedRow = row.toLowerCase();
+    // if (!Number(row)) {
+    //   const rowIndex = this.letterToIndex(row.toLowerCase());
+    // }
     const relevantPuzzleArray =
       this.constructSudokuObj(puzzleString)[this.letterToIndex(normalizedRow)];
     const puzzleStringUpdated = this.updateWithCheckNumber(
@@ -149,6 +150,24 @@ class SudokuSolver {
   }
 
   solve(puzzleString) {
+    const sudokuObj = this.constructSudokuObj(puzzleString)
+    // finding the row and column where . appears:
+    let row
+    let column
+    for (let i=0; i < 9; i++) {
+      if (sudokuObj[i].includes('.')) {
+        row = i
+        column = sudokuObj[i].indexOf('.')
+        break
+      }
+    }
+    let value = 1
+    // now i can check if there will be an error when substituting the . for a number:
+    const isRowValid = this.checkRowPlacement(puzzleString, row, column, value)
+    // const nextInLine = puzzleString.substring(0, nextDot) + number + puzzleString.substring(nextDot + 1)
+    // find the row and column of the index, then like use it together with the checks, right? like yeah
+
+
     // if (!solution) {
     //   throw {error: 'Puzzle cannot be solved' }
     // }
