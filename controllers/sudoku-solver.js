@@ -43,7 +43,6 @@ class SudokuSolver {
       g: 6,
       h: 7,
       i: 8,
-      j: 9,
     };
     return mapping[letter];
   }
@@ -62,9 +61,7 @@ class SudokuSolver {
   }
 
   checkRowPlacement(puzzleString, row, column, value) {
-    // if (!Number(row)) {
-    //   const rowIndex = this.letterToIndex(row.toLowerCase());
-    // }
+    const normalizedRow = row.toLowerCase()
     const relevantPuzzleArray =
       this.constructSudokuObj(puzzleString)[this.letterToIndex(normalizedRow)];
     const puzzleStringUpdated = this.updateWithCheckNumber(
@@ -74,9 +71,9 @@ class SudokuSolver {
     );
 
     if (!this.onlyUniqueNumbers(puzzleStringUpdated)) {
-      console.log('false row');
       return false;
     } else {
+      console.log('passing row check')
       return true;
     }
   }
@@ -94,9 +91,9 @@ class SudokuSolver {
     );
 
     if (!this.onlyUniqueNumbers(puzzleStringUpdated)) {
-      console.log('false column');
       return false;
     } else {
+      console.log('passing col check')
       return true;
     }
   }
@@ -140,37 +137,81 @@ class SudokuSolver {
     const chunkedArray = this.stringToRegArray(puzzleStringUpdated);
     const normalizedRow = row.toLowerCase();
     const indexNumber = Number(column) * (this.letterToIndex(normalizedRow) + 1);
-    const arrayIndex = Math.floor(indexNumber / 9);
+    let arrayIndex = Math.floor(indexNumber / 9);
+    if (arrayIndex === 9) {
+      arrayIndex = 8
+    }
     if (!this.onlyUniqueNumbers(chunkedArray[arrayIndex])) {
-      console.log('false region');
       return false;
     } else {
+      console.log('passing region check')
       return true;
     }
   }
 
   solve(puzzleString) {
-    const sudokuObj = this.constructSudokuObj(puzzleString)
-    // finding the row and column where . appears:
-    let row
-    let column
-    for (let i=0; i < 9; i++) {
-      if (sudokuObj[i].includes('.')) {
-        row = i
-        column = sudokuObj[i].indexOf('.')
-        break
+    const sudokuObj = this.constructSudokuObj(puzzleString);
+    const numberLetterTable = {
+      0: 'a',
+      1: 'b',
+      2: 'c',
+      3: 'd',
+      4: 'e',
+      5: 'f',
+      6: 'g',
+      7: 'h',
+      8: 'i',
+    };
+
+    const findEmptySpot = (sudokuObj) => {
+      for (let i = 0; i < 9; i++) {
+        for (let j = 0; j < 9; j++) {
+          if (sudokuObj[i][j] === '.') {
+            return [i, j];
+          }
+        }
       }
+      return null;
+    };
+    const isValidPlacement = (puzzleString, row, column, value) => {
+      const letter = numberLetterTable[row];
+      return (
+        this.checkRowPlacement(puzzleString, letter, column + 1, value) &&
+        this.checkColPlacement(puzzleString, letter, column + 1, value) &&
+        this.checkRegionPlacement(puzzleString, letter, column + 1, value)
+      );
+    };
+
+    const solveHelper = (sudokuObj, puzzleString) => {
+      const emptySpot = findEmptySpot(sudokuObj);
+      if (!emptySpot) {
+        return true;
+      }
+
+      const [row, col] = emptySpot;
+      for (let value = 1; value <= 9; value++) {
+        const valueStr = value.toString();
+        if (isValidPlacement(puzzleString, row, col, valueStr)) {
+          sudokuObj[row][col] = valueStr;
+          if (solveHelper(sudokuObj, puzzleString.slice(0, row * 9 + col) + valueStr + puzzleString.slice(row * 9 + col + 1))) {
+            return true;
+          }
+          sudokuObj[row][col] = '.';
+        }
+      }
+      return false;
+    };
+
+    if (solveHelper(sudokuObj, puzzleString)) {
+      console.log('solution found')
+      let solvedString = '';
+      for (let i = 0; i < 9; i++) {
+        solvedString += sudokuObj[i].join('');
+      }
+      return solvedString;
+    } else {
+      throw { error: 'Puzzle cannot be solved' };
     }
-    let value = 1
-    // now i can check if there will be an error when substituting the . for a number:
-    const isRowValid = this.checkRowPlacement(puzzleString, row, column, value)
-    // const nextInLine = puzzleString.substring(0, nextDot) + number + puzzleString.substring(nextDot + 1)
-    // find the row and column of the index, then like use it together with the checks, right? like yeah
-
-
-    // if (!solution) {
-    //   throw {error: 'Puzzle cannot be solved' }
-    // }
   }
 }
 
