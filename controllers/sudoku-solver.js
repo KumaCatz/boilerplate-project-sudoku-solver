@@ -3,12 +3,14 @@ class SudokuSolver {
     const match = /^[0-9.]+$/;
 
     if (!puzzleString || puzzleString.length === 0) {
-      throw { error: 'Required field missing' };
+      return { error: 'Required field missing' };
     } else if (!match.test(puzzleString)) {
-      throw { error: 'Invalid characters in puzzle' };
+      return { error: 'Invalid characters in puzzle' };
     } else if (puzzleString.length !== 81) {
-      throw { error: 'Expected puzzle to be 81 characters long' };
+      return { error: 'Expected puzzle to be 81 characters long' };
     }
+
+    return puzzleString
   }
 
   constructSudokuObj(string) {
@@ -73,7 +75,6 @@ class SudokuSolver {
     if (!this.onlyUniqueNumbers(puzzleStringUpdated)) {
       return false;
     } else {
-      console.log('passing row check')
       return true;
     }
   }
@@ -93,7 +94,6 @@ class SudokuSolver {
     if (!this.onlyUniqueNumbers(puzzleStringUpdated)) {
       return false;
     } else {
-      console.log('passing col check')
       return true;
     }
   }
@@ -144,7 +144,6 @@ class SudokuSolver {
     if (!this.onlyUniqueNumbers(chunkedArray[arrayIndex])) {
       return false;
     } else {
-      console.log('passing region check')
       return true;
     }
   }
@@ -203,14 +202,13 @@ class SudokuSolver {
     };
 
     if (solveHelper(sudokuObj, puzzleString)) {
-      console.log('solution found')
       let solvedString = '';
       for (let i = 0; i < 9; i++) {
         solvedString += sudokuObj[i].join('');
       }
       return solvedString;
     } else {
-      throw { error: 'Puzzle cannot be solved' };
+      return { error: 'Puzzle cannot be solved' };
     }
   }
 }
