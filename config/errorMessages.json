@@ -1,0 +1,9 @@
+{
+    "row": "Row placement is invalid.",
+    "column": "Column placement is invalid.",
+    "region": "Region placement is invalid.",
+    "field": "Required field missing",
+    "fields": "Required field(s) missing",
+    "invalidChar": "Invalid characters in puzzle",
+    "length": "Expected puzzle to be 81 characters long"
+}

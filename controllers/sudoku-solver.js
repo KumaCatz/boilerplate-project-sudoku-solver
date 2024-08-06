@@ -1,13 +1,13 @@
+const errorMessages = require('../config/errorMessages.json')
+
 class SudokuSolver {
   validate(puzzleString) {
     const match = /^[0-9.]+$/;
 
-    if (!puzzleString || puzzleString.length === 0) {
-      return { error: 'Required field missing' };
-    } else if (!match.test(puzzleString)) {
-      return { error: 'Invalid characters in puzzle' };
+      if (!match.test(puzzleString)) {
+      return { error: errorMessages.invalidChar };
     } else if (puzzleString.length !== 81) {
-      return { error: 'Expected puzzle to be 81 characters long' };
+      return { error: errorMessages.length };
     }
 
     return puzzleString
