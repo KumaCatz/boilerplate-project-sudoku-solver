@@ -5,5 +5,7 @@
     "field": "Required field missing",
     "fields": "Required field(s) missing",
     "invalidChar": "Invalid characters in puzzle",
-    "length": "Expected puzzle to be 81 characters long"
+    "length": "Expected puzzle to be 81 characters long",
+    "coordinate": "Invalid coordinate",
+    "value": "Invalid value"
 }
